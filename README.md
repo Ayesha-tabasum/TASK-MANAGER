@@ -65,7 +65,7 @@ TASK-MANAGER/
 ### Clone the repository
 
 ```bash
-git clone https://github.com/your-username/TASK-MANAGER.git
+git clone https://github.com/Ayesha-tabasum/TASK-MANAGER.git
 ```
 
 ```bash
@@ -87,8 +87,8 @@ Example:
 
 ```env
 PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
+MONGO_URI=*****************************
+JWT_SECRET=*******************
 ```
 
 Start the backend:
