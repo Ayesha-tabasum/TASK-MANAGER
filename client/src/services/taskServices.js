@@ -1,65 +1,51 @@
 import api from "./api";
 
+const token = () => localStorage.getItem("token");
 
-
-//get task
-export const getTask = async (page, limit) => {
-  const token = localStorage.getItem("token");
-
-  const res = await api.get(`/task?page=${page}&limit=${limit}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+// create task
+export const createTask = async (data) => {
+  const res = await api.post(`/task`, data, {
+    headers: { Authorization: `Bearer ${token()}` },
   });
-
   return res.data;
 };
 
+// get tasks
+export const getTask = async (page, limit) => {
+  const res = await api.get(`/task?page=${page}&limit=${limit}`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  });
+  return res.data;
+};
 
-    //search task
+// search task
+export const searchTask = async (keyword) => {
+  const res = await api.get(`/task/search?keyword=${keyword}`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  });
+  return res.data;
+};
 
-   export const searchTask=async (keyword) => {
- const token=localStorage.getItem("token");
-      const search=await api.get(`/search?keyword=${keyword}`,{
-              headers: {
-                  Authorization: `Bearer ${token}`,
-            }
-      })
-      return search.data;
-    }
+// filter task
+export const filterTask = async (priority) => {
+  const res = await api.get(`/task/filter?priority=${priority}`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  });
+  return res.data;
+};
 
-  export  const filterTask=async (priority) => {
- const token=localStorage.getItem("token");
-      const filter=await api.get(`/filter?priority=${priority}`,{
-              headers: {
-                  Authorization: `Bearer ${token}`,
-            }
-      })
-      return filter.data;
-    }
+// edit task
+export const editTask = async (id, data) => {
+  const res = await api.put(`/task/${id}`, data, {
+    headers: { Authorization: `Bearer ${token()}` },
+  });
+  return res.data;
+};
 
-
-    //edit function
-
-    export const editTask=async (id,data) => {
-      const token= localStorage.getItem("token");
-      const task=await api.put(`/${id}`,data,{
-                   headers:{
-                  Authorization: `Bearer ${token}`,
-            }}
-      
-      );
-      return task.data;
-    }
-
-    //delete function
-    export const deleteTask=async (id) => {
-      const token=localStorage.getItem("token");
-      const task=await api.delete(`/${id}`,{
-                   headers:{
-                  Authorization: `Bearer ${token}`,
-            }}
-      
-      );
-      return task.data;
-    }
+// delete task
+export const deleteTask = async (id) => {
+  const res = await api.delete(`/task/${id}`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  });
+  return res.data;
+};

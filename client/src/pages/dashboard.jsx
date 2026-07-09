@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { getTask } from "../services/taskServices";
 import { searchTask } from "../services/taskServices";
-import { editTask, deleteTask } from "../services/taskServices";
+import { editTask, deleteTask,createTask } from "../services/taskServices";
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
+  const [title, setTitle] = useState("");
+const [description, setDescription] = useState("");
+const [priority, setPriority] = useState("LOW");
 
   const [task, setTask] = useState([]);
   const [page, setPage] = useState(1);
@@ -27,6 +30,27 @@ function Dashboard() {
     loadData();
   }, [keyword, page]);
 
+
+  const handleCreate = async (e) => {
+  e.preventDefault();
+
+  if (!title.trim() || !description.trim()) return;
+
+  try {
+    await createTask({ title, description, priority });
+
+    setTitle("");
+    setDescription("");
+    setPriority("LOW");
+
+    const data = await getTask(page, 10);
+    setTask(data.tasks);
+    setTotalPages(data.totalPages);
+
+  } catch (err) {
+    console.error(err);
+  }
+};
   const handleEdit = async (id, oldTitle, oldDesc) => {
     const newTitle = prompt("Enter new title", oldTitle);
     const newDesc = prompt("Enter new description", oldDesc);
@@ -45,16 +69,19 @@ function Dashboard() {
     );
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
+ const handleDelete = async (id) => {
+  const confirmDelete = window.confirm(
     "Are you sure you want to delete this task?"
   );
 
   if (!confirmDelete) return;
-    await deleteTask(id);
 
-    setTask((prev) => prev.filter((t) => t._id !== id));
-  };
+  await deleteTask(id);
+
+  const data = await getTask(page, 10);
+  setTask(data.tasks);
+  setTotalPages(data.totalPages);
+};
 
   return (
     <div className="dashboard">
@@ -64,6 +91,27 @@ function Dashboard() {
             <h2>{user?.name}</h2>
         <p>Role: {user?.role}</p>
       </div>
+
+      <form className="create-task-form" onSubmit={handleCreate}>
+  <input
+    type="text"
+    placeholder="Task title"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+  />
+  <input
+    type="text"
+    placeholder="Task description"
+    value={description}
+    onChange={(e) => setDescription(e.target.value)}
+  />
+  <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+    <option value="LOW">Low</option>
+    <option value="MEDIUM">Medium</option>
+    <option value="HIGH">High</option>
+  </select>
+  <button type="submit">Add Task</button>
+</form>
 
       <div className="second-part">
         <div className="search-box">
@@ -77,11 +125,11 @@ function Dashboard() {
       </div>
 
       <div className="grid-task">
-        {task.map((t) => (
-          <div
-            className={`tasks priority-${t.priority.toLowerCase()}`}
-            key={t._id}
-          >
+       {task.map((t) => (
+        <div
+    className={`tasks priority-${(t.priority || "low").toLowerCase()}`}
+    key={t._id}
+         >
             <h2>{t.title}</h2>
             <p>{t.description}</p>
 
@@ -113,10 +161,15 @@ function Dashboard() {
             </div>
 
             <div className="date">
-              <p>Created: {new Date(t.createdAt).toLocaleDateString()}</p>
-
-              <p>Updated: {new Date(t.updatedAt).toLocaleDateString()}</p>
-            </div>
+  <p>
+    Created:{" "}
+    {t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "Just now"}
+  </p>
+  <p>
+    Updated:{" "}
+    {t.updatedAt ? new Date(t.updatedAt).toLocaleDateString() : "Just now"}
+  </p>
+</div>
           </div>
         ))}
       </div>

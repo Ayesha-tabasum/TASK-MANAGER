@@ -1,58 +1,61 @@
+import Task from "../models/task.js";
 
-import task from "../models/task.js";
-import Task  from "../models/task.js";
+// CREATE TASK
+export const createTask = async (req, res) => {
+  try {
+    const { title, description, priority } = req.body;
 
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
 
-//create task
-export const createTask=async (req,res) => {
-    try{
-      const task=await Task.create({
-         ...req.body,
-         user: req.user,
-      })
-       res.status(200).json({
-        message: "task added successfully! "
+    const newTask = await Task.create({
+      title,
+      description,
+      priority,
+      user: req.user._id,
     });
-    }
-    catch(error){
-            res.status(500).json({ message: error.message });
-    }
-}
 
+    res.status(201).json({
+      message: "Task added successfully!",
+      task: newTask,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-//get task
+// GET TASKS (with pagination)
+export const getTask = async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-export const getTask=async (req,res) => {
-    try{
-        const page=Number(req.query.page) ||1;
-        const limit=Number(req.query.limit) || 10;
-        const skip=(page-1)*limit;
+    const totalTask = await Task.countDocuments({ user: req.user._id });
+    const tasks = await Task.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-        const totalTask=await Task.countDocuments({user: req.user});
-        const tasks=await Task.find({user: req.user}).sort({createdAt: -1}).skip(skip).limit(limit);
+    res.status(200).json({
+      totalTask,
+      currentPage: page,
+      totalPages: Math.ceil(totalTask / limit),
+      tasks,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-        res.status(200).json({
-          totalTask,
-          currentPage : page,
-          totalPages : Math.ceil(totalTask/limit),
-          tasks,
-        })
-    
-    }catch(error){
-       res.status(500).json({ message: error.message });
-    }
-}
-
-
-
-//edit task
-
+// UPDATE TASK
 export const updateTask = async (req, res) => {
   try {
     const task = await Task.findOneAndUpdate(
       {
         _id: req.params.id,
-        user: req.user,
+        user: req.user._id,
       },
       req.body,
       {
@@ -60,81 +63,78 @@ export const updateTask = async (req, res) => {
       }
     );
 
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
     res.status(200).json(task);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
-//delete task
-
+// DELETE TASK
 export const deleteTask = async (req, res) => {
   try {
-    await Task.findOneAndDelete({
+    const deletedTask = await Task.findOneAndDelete({
       _id: req.params.id,
-      user: req.user,
+      user: req.user._id,
     });
+
+    if (!deletedTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
 
     res.status(200).json({
       message: "Task deleted successfully",
     });
-
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
+// SEARCH TASK
+export const searchTask = async (req, res) => {
+  try {
+    const keyword = req.query.keyword || "";
 
-//SEARCH  API
-
-export const searchTask=async(req,res)=>{
-    try{
-         const keyword=req.query.keyword;
-     let task=await Task.find({
-            user: req.user,
-              title :{
-         $regex : keyword,
-             $options : "i"
-        }
-    
- });
- res.status(200).json(task)
-    }catch(error){
-        res.status(500).json({
-            message: error.message
-        })
-    } 
-}
-
-
-
-//FILTER API
-
-export const filterTask=async (req,res) => {try {
-    const {priority}=req.query;
-    let task=await Task.find({
-        priority: priority,
-        user: req.user
+    const task = await Task.find({
+      user: req.user._id,
+      title: {
+        $regex: keyword,
+        $options: "i",
+      },
     });
+
     res.status(200).json(task);
-} catch (error) {
-    res.status(500).json({
-        message: error.message ,
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-    })
-}}
+// FILTER TASK
+export const filterTask = async (req, res) => {
+  try {
+    const { priority } = req.query;
 
-//get profile
+    const filter = { user: req.user._id };
+    if (priority) {
+      filter.priority = priority;
+    }
+
+    const task = await Task.find(filter);
+
+    res.status(200).json(task);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET PROFILE
 export const getProfile = async (req, res) => {
   try {
     res.status(200).json(req.user);
   } catch (error) {
-    res.status(500).json({
-      message: "Server Error",
-    });
+    res.status(500).json({ message: "Server Error" });
   }
 };

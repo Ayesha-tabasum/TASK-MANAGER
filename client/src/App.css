@@ -139,6 +139,78 @@ body{
     margin: 4px;
     font-weight: bold;
 }
+
+/* Create Task Form */
+.create-task-form{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    background:#1E293B;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:20px;
+    margin:20px;
+    flex-wrap:wrap;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+.create-task-form input{
+    flex:1;
+    min-width:180px;
+    padding:12px;
+    background:#334155;
+    border:2px solid #475569;
+    border-radius:8px;
+    color:white;
+    font-size:15px;
+    outline:none;
+    transition:.3s;
+}
+
+.create-task-form input::placeholder{
+    color:#94A3B8;
+}
+
+.create-task-form input:focus{
+    border-color:#3B82F6;
+    box-shadow:0 0 10px rgba(59,130,246,.4);
+}
+
+.create-task-form select{
+    padding:12px;
+    background:#334155;
+    border:2px solid #475569;
+    border-radius:8px;
+    color:white;
+    font-size:15px;
+    outline:none;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.create-task-form select:focus{
+    border-color:#3B82F6;
+    box-shadow:0 0 10px rgba(59,130,246,.4);
+}
+
+.create-task-form button{
+    padding:12px 24px;
+    border:none;
+    border-radius:8px;
+    background:#3B82F6;
+    color:white;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    white-space:nowrap;
+}
+
+.create-task-form button:hover{
+    background:#2563EB;
+    transform:translateY(-2px);
+}
+
 .second-part{
     display:flex;
     justify-content:space-between;
@@ -313,6 +385,15 @@ body{
 
     .dashboard h1{
         font-size:24px;
+    }
+
+    .create-task-form{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .create-task-form button{
+        width:100%;
     }
 
 }
