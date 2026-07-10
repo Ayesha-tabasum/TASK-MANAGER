@@ -1,18 +1,25 @@
 import { useState } from "react";
 import { registerUser } from "../services/authServices";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Register(){
             const navigate = useNavigate();
            const [form,setForm]=useState({name: "",email: "",password: ""});
            const submitHandler=async(e)=>{
             e.preventDefault();
+
+                    if (!form.name || !form.email || !form.password) {
+    toast.warning("All fields are required");
+    return;
+  }
+  
             try{
                  await registerUser(form);
-            alert("User Registered successfully ");
+            toast.success("User Registered successfully ");
             navigate("/login");
             }catch(error){
-                  alert(error.response?.data?.message || "Something went wrong");;
+                  toast.error(error.response?.data?.message || "Something went wrong");;
             }
             
             

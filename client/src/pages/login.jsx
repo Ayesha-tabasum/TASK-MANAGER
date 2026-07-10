@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { loginUser } from "../services/authServices";
 import { useNavigate } from 'react-router-dom'
+import { toast } from "react-toastify";
 
 function Login(){
     const navigate=useNavigate();
@@ -9,14 +10,20 @@ function Login(){
         e.preventDefault();
 
         if (!form.email.trim() || !form.password.trim()) {
-    alert("All fields are required");
+    toast.error("All fields are required");
     return;
   }
-        let data=await loginUser(form);
-        
+  try{
+              let data=await loginUser(form);
+        toast.success("User Logged In Successfully")
         localStorage.setItem("token" , data.token);
         localStorage.setItem("user",JSON.stringify(data.user));
         navigate("/dashboard");
+  }catch (error) {
+    toast.error(error.response?.data?.message || "Invalid email or password");
+  }
+        
+  
      };
      return(
         <form  className="auth-form" onSubmit={submitHandler}>

@@ -87,9 +87,9 @@ const [priority, setPriority] = useState("LOW");
     <div className="dashboard">
       <h1>Dashboard</h1>
       <div className="user">
-        <h3>Welcome  </h3>
-            <h2>{user?.name}</h2>
-        <p>Role: {user?.role}</p>
+        
+            <h2> WELCOME {user?.name}</h2>
+        
       </div>
 
       <form className="create-task-form" onSubmit={handleCreate}>
