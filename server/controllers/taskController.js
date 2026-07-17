@@ -59,7 +59,7 @@ export const updateTask = async (req, res) => {
       },
       req.body,
       {
-        new: true,
+        new: true,runValidators: true
       }
     );
 
@@ -129,6 +129,7 @@ export const filterTask = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // GET PROFILE
 export const getProfile = async (req, res) => {
